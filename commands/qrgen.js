@@ -10,12 +10,12 @@ module.exports = {
         const qrQuery = interaction.options.getString('input');
         getQr(qrQuery).then(async res => {
             console.log(res.body)
-            await interaction.reply(res.body.toString())
+            await interaction.reply({files : [res.body]})
         })
 		;
 	},
 };
 
 const getQr = async (query) => {
-    return await needle('get', 'https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=Hello')
+    return await needle('post', `https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=${query}`)
 }
