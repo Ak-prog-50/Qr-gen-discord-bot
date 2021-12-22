@@ -5,8 +5,11 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('qrgen')
 		.setDescription('Replies with a Generated QR Code!')
-        .addBooleanOption(option => option.setName('urlselect').setDescription('Set this to true if you want to encode a URL'))
-        .addStringOption(option => option.setName('query').setDescription('Enter data (plain text or url)!'))
+        .addStringOption(option => option.setName('query')
+            .setDescription('*Enter data (plain text or url)!')
+            .setRequired(true))
+        .addBooleanOption(option => option.setName('urlselect')
+            .setDescription('Set this to true if you want to encode a URL'))
         .addStringOption(option => option.setName('size')
             .setDescription('Select a size for your qr code.')
             .addChoice('50px by 50px', '50x50')
@@ -15,18 +18,17 @@ module.exports = {
             .addChoice('500px by 500px', '500x500')
             .addChoice('750px by 750px', '750x750')
             .addChoice('1000px by 1000px', '1000x1000')),
+
 	execute(interaction) {
         const qrQuery = interaction.options.getString('query');
         const qrSize = interaction.options.getString('size')
         const urlSelect = interaction.options.getBoolean('urlselect')
-        console.log(typeof(qrQuery),qrQuery)
+        const defaultSize = '120x120' 
         
         let encodedQuery;
-
         if (urlSelect) encodedQuery = encodeURI(qrQuery)
-        
-        console.log(encodedQuery, qrSize)
-        getQr(encodedQuery || qrQuery, qrSize).then(async res => {
+
+        getQr(encodedQuery || qrQuery, qrSize || defaultSize).then(async res => {
             console.log(res.body)
             await interaction.reply({files : [res.body]})
         });
@@ -37,7 +39,7 @@ const getQr = async (query, size) => {
     let paramsObj = {
         data : query,
         size : size,
-        margin : 4
+        margin : 7
     };
     let searchParams = new URLSearchParams(paramsObj);
     let params = searchParams.toString();
